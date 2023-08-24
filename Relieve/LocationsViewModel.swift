@@ -11,7 +11,8 @@ import SwiftUI
 
 class LocationViewModel: ObservableObject{
     @StateObject var locationManager = LocationManager()
-
+    //default location
+    let locationy = Location(address: "default", coordinates: CodableCoordinate(coordinate: CLLocationCoordinate2D(latitude: 32.21, longitude: 34.86)), isFree: true, cost: 0, cleanliness: 4.5)
     //all locations
     @Published var locations: [Location]
     //current location on map
@@ -27,10 +28,10 @@ class LocationViewModel: ObservableObject{
     
     init(){
         self.locations = [Location]()
-        //self.locations = LocationsDataService.locations
+        self.locations.append(locationy)
         //self.mapLocation = locations.first!
-        //self.updateMapRegion(location: locations.first!.coordinates.coordinate)
-        self.updateMapRegion(location: (locationManager.locationManager?.location!.coordinate)!)
+        self.updateMapRegion(location: locationy.coordinates.coordinate)
+        //self.updateMapRegion(location: (locationManager.locationManager?.location!.coordinate)!)
     }
     
     func updateMapRegion(location: CLLocationCoordinate2D){

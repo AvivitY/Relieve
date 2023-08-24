@@ -6,7 +6,7 @@ class LocationsDataService {
     static let locations: [Location] = [
         Location(
             address: "123 Main Street",
-            coordinates:CodableCoordinate(coordinate: CLLocationCoordinate2D(latitude: 41.8902, longitude: 12.4922)),
+            coordinates:CodableCoordinate(coordinate: CLLocationCoordinate2D(latitude: 37.785834, longitude: -122.406417)),
             isFree: true,
             cost:0,
             cleanliness: 3.5),

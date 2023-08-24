@@ -18,12 +18,6 @@ struct AddLocationView: View {
     var body: some View {
         NavigationView {
             VStack {
-//                TextField("Enter Address",text: $text)
-//                    .padding()
-//                    .background(Color.gray.opacity(0.3).cornerRadius(10))
-//                    .foregroundColor(.black)
-//                    .font(.headline)
-//                    .autocorrectionDisabled()
                 cost
                 Button {
                     let coor = locationManager.locationManager!.location!.coordinate

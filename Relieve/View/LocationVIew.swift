@@ -10,19 +10,16 @@ import MapKit
 struct LocationVIew: View {
     @State private var showAddView: Bool = false
     @State private var loading: Bool = true
-    @State private var searchText: String = "Search.."
     @State private var showLocationSearchView = false
     @EnvironmentObject var searchViewmodel: LocationSearchViewModel
     @EnvironmentObject private var vm :LocationViewModel
     @StateObject var locationManager = LocationManager()
     @State var showPopUp :Bool = false
-    let locationy = Location(address: "default", coordinates: CodableCoordinate(coordinate: CLLocationCoordinate2D(latitude: 32.21, longitude: 34.86)), isFree: true, cost: 0, cleanliness: 4.5)
     var body: some View {
         ZStack {
            if let coordinate = searchViewmodel.selectedLocationCoordinate{
                Text("hi").foregroundColor(Color.white.opacity(0)).onAppear{
                    vm.updateMapRegion(location: coordinate)
-                   searchText =  searchViewmodel.selectedLocation!
                }
            }
             if showLocationSearchView{
@@ -39,7 +36,6 @@ struct LocationVIew: View {
                         }
                     }
                     locationList
-                    
                 }.overlay(alignment: .bottom){
                     addButton
                 }
@@ -58,7 +54,7 @@ struct LocationVIew_Previews: PreviewProvider {
 extension LocationVIew{
     private var header: some View{
         HStack(){
-            Text(searchText)
+            Text(searchViewmodel.selectedLocation ?? "Search..")
                     .font(.title2)
                     .fontWeight(.black)
                     .foregroundColor(.primary)
@@ -79,8 +75,11 @@ extension LocationVIew{
                     }
                 }
             Button{
-                vm.updateMapRegion(location: (locationManager.locationManager?.location!.coordinate)!)
-                searchText = "Search.."
+                if(locationManager.locationManager?.location?.coordinate) != nil
+                {
+                    vm.updateMapRegion(location: (locationManager.locationManager?.location!.coordinate)!)
+                }
+                searchViewmodel.selectedLocation = nil
                 }
             label:{
                 Image(systemName: "scope")
@@ -126,24 +125,34 @@ extension LocationVIew{
                     ProgressView("Loading...")
                         .progressViewStyle(CircularProgressViewStyle(tint: .blue))
             }
-            ScrollView{
-                LazyVStack(spacing: 0){
-                    ForEach(vm.locations){ location in
-                        Button{
-                            showPopUp.toggle()
-                        }label:{
-                            LocationPreviewView(location: location)
-                                .padding()
-                            
+            VStack {
+                ScrollView{
+                    LazyVStack(spacing: 0){
+                        if !loading{
+                            ForEach(vm.locations){ location in
+                                Button{
+                                    showPopUp.toggle()
+                                }label:{
+                                    LocationPreviewView(location: location)
+                                        .padding()
+                                    
+                                }
+                            }
                         }
+                    }.task {
+                        vm.updateLocation { success in
+                            loading = false
+                        }
+                    }.sheet(item: $vm.sheetLocation, onDismiss: nil){
+                        location in LocationDetailView(location: location)
                     }
-                }.task {
-                    vm.updateLocation { success in
-                        loading = false
-                    }
-                }.sheet(item: $vm.sheetLocation, onDismiss: nil){
-                    location in LocationDetailView(location: location)
                 }
+                Divider().frame(height:1).overlay(Color.gray)
+            }.padding(.bottom,40)
+        }.onAppear{
+            if(locationManager.locationManager?.location?.coordinate) != nil
+            {
+                vm.updateMapRegion(location: (locationManager.locationManager?.location!.coordinate)!)
             }
         }
     }

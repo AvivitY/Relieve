@@ -50,5 +50,3 @@ extension LocationSearchViewModel: MKLocalSearchCompleterDelegate{
         self.results = completer.results
     }
 }
-
-
